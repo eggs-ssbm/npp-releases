@@ -2,7 +2,6 @@
 
 This repository hosts official release builds for **Netplay+**.
 
-New versions are published here to support **automatic updates** inside the app via [electron-updater](https://www.electron.build/auto-update).
 
 ### 🚀 Usage
 - Releases are not intended for auto-update functionality (yet).
