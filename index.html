@@ -1,0 +1,324 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Netplay+</title>
+<meta name="description" content="Achievements, medals and an in-game overlay for Slippi netplay.">
+<link rel="icon" href="logo.png">
+
+<meta property="og:title" content="Netplay+">
+<meta property="og:description" content="Achievements, medals and an in-game overlay for Slippi netplay.">
+<meta property="og:image" content="logo.png">
+<meta property="og:type" content="website">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap">
+
+<style>
+  /* The app's own palette, so the site and the client look like one product.
+     Single-theme on purpose: Netplay+ is a dark app and this page matches it
+     rather than following the visitor's OS preference. */
+  :root {
+    --bg:            #10141c;
+    --bg-panel:      #1a2130;
+    --bg-panel-alt:  #212a3d;
+    --border:        #2a3446;
+    --border-strong: #3a4a63;
+    --text:          #ffffff;
+    --text-dim:      #c2cad8;
+    --text-muted:    #8993a4;
+    --accent:        #3b82f6;
+    --accent-hover:  #2f6fd8;
+    --accent-tint:   #a0b6d9;
+    --success:       #4CAF50;
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: "M PLUS Rounded 1c", system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.6;
+  }
+  a { color: var(--accent); }
+
+  .wrap { max-width: 980px; margin: 0 auto; padding: 0 20px; }
+
+  /* ---------- hero ---------- */
+  .hero {
+    position: relative;
+    text-align: center;
+    padding: 72px 0 56px;
+    overflow: hidden;
+  }
+  /* A soft accent bloom behind the logo. Pure CSS so there is no image to load
+     before the page reads as finished. */
+  .hero::before {
+    content: "";
+    position: absolute;
+    top: -180px; left: 50%;
+    width: 760px; height: 480px;
+    transform: translateX(-50%);
+    background: radial-gradient(ellipse at center, rgba(59,130,246,0.18), transparent 68%);
+    pointer-events: none;
+  }
+  .hero > * { position: relative; }
+
+  .logo {
+    width: 104px; height: 104px;
+    image-rendering: -webkit-optimize-contrast;
+    filter: drop-shadow(0 6px 20px rgba(0,0,0,0.5));
+  }
+  h1 {
+    font-size: clamp(42px, 8vw, 68px);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    margin: 14px 0 6px;
+    line-height: 1;
+  }
+  .tagline {
+    font-size: clamp(16px, 2.4vw, 19px);
+    color: var(--text-dim);
+    margin: 0 auto 30px;
+    max-width: 30ch;
+    text-wrap: balance;
+  }
+
+  /* ---------- download ---------- */
+  .cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 11px;
+    background: var(--accent);
+    color: #fff;
+    font-family: inherit;
+    font-size: 18px;
+    font-weight: 700;
+    text-decoration: none;
+    padding: 15px 34px;
+    border-radius: 12px;
+    border: none;
+    box-shadow: 0 6px 22px -8px rgba(59,130,246,0.75);
+    transition: background 0.15s ease, transform 0.15s ease;
+  }
+  .cta:hover { background: var(--accent-hover); transform: translateY(-1px); }
+  .cta:active { transform: translateY(0); }
+  .cta:focus-visible { outline: 3px solid var(--accent-tint); outline-offset: 3px; }
+  .cta svg { width: 19px; height: 19px; flex: none; }
+
+  .meta {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-top: 14px;
+    min-height: 1.6em;
+  }
+  .meta .sep { opacity: 0.4; margin: 0 7px; }
+  .platform { font-size: 13.5px; color: var(--text-muted); margin-top: 6px; }
+
+  /* ---------- sections ---------- */
+  /* Qualified with .wrap deliberately. The sections ARE .wrap elements, and a
+     bare `section` selector loses to `.wrap { padding: 0 20px }` on
+     specificity, which silently flattens all the vertical rhythm to zero. */
+  section.wrap { padding-top: 46px; padding-bottom: 46px; }
+  section.wrap + section.wrap { padding-top: 10px; }
+  h2 {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+    color: var(--accent-tint);
+    margin: 0 0 20px;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 14px;
+  }
+  .card {
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-radius: 13px;
+    padding: 20px 21px;
+  }
+  .card h3 {
+    font-size: 16.5px;
+    font-weight: 700;
+    margin: 0 0 6px;
+  }
+  .card p {
+    margin: 0;
+    font-size: 14.5px;
+    color: var(--text-dim);
+  }
+
+  /* ---------- install steps ---------- */
+  ol.steps { list-style: none; counter-reset: s; margin: 0; padding: 0; }
+  ol.steps li {
+    counter-increment: s;
+    position: relative;
+    padding: 0 0 18px 46px;
+    color: var(--text-dim);
+    font-size: 15px;
+  }
+  ol.steps li:last-child { padding-bottom: 0; }
+  ol.steps li::before {
+    content: counter(s);
+    position: absolute; left: 0; top: -1px;
+    width: 28px; height: 28px;
+    display: grid; place-items: center;
+    background: var(--bg-panel-alt);
+    border: 1px solid var(--border-strong);
+    border-radius: 50%;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 13px;
+    color: var(--accent-tint);
+  }
+  ol.steps strong { color: var(--text); font-weight: 700; }
+
+  .note {
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: 10px;
+    padding: 15px 18px;
+    font-size: 14.5px;
+    color: var(--text-dim);
+    margin-top: 22px;
+  }
+
+  footer {
+    border-top: 1px solid var(--border);
+    margin-top: 30px;
+    padding: 26px 0 50px;
+    text-align: center;
+    font-size: 13.5px;
+    color: var(--text-muted);
+  }
+  footer a { color: var(--text-dim); }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; scroll-behavior: auto !important; }
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <img class="logo" src="logo.png" alt="">
+    <h1>Netplay+</h1>
+    <p class="tagline">Achievements, medals and an in-game overlay for Slippi netplay.</p>
+
+    <!-- Defaults to the /releases/latest redirect, which always resolves and
+         needs no JavaScript. The script below upgrades it to the direct
+         installer link once it knows the current filename. -->
+    <a class="cta" id="download" href="https://github.com/eggs-ssbm/npp-releases/releases/latest">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+           stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+        <polyline points="7 10 12 15 17 10"></polyline>
+        <line x1="12" y1="15" x2="12" y2="3"></line>
+      </svg>
+      Download for Windows
+    </a>
+
+    <div class="meta" id="meta"></div>
+    <p class="platform">Windows 10 or later &middot; requires Slippi Dolphin</p>
+  </div>
+</header>
+
+<main>
+  <section class="wrap">
+    <h2>What it does</h2>
+    <div class="grid">
+      <div class="card">
+        <h3>Achievements &amp; Clout</h3>
+        <p>Hundreds of achievements for stages, characters, wins, combos and ranked milestones. Each one pays Clout, and the leaderboard ranks everyone by it.</p>
+      </div>
+      <div class="card">
+        <h3>In-game overlay</h3>
+        <p>Medals pop over Dolphin the moment you earn them, without leaving the match or alt-tabbing.</p>
+      </div>
+      <div class="card">
+        <h3>Combo detection</h3>
+        <p>Recognises signature kills as they happen &mdash; stomp knees, waveshine upsmashes, Ken combos, rests and a lot more besides.</p>
+      </div>
+      <div class="card">
+        <h3>Your playercard</h3>
+        <p>Avatars, titles, flairs and colours, all earned. Show off what you have actually done.</p>
+      </div>
+      <div class="card">
+        <h3>Challenges</h3>
+        <p>Weekly challenges, a daily bingo board, and long-haul runs like Iron Man for when you want a real goal.</p>
+      </div>
+      <div class="card">
+        <h3>Friends &amp; blocking</h3>
+        <p>See who is online, and keep specific players out of your unranked matchmaking.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap">
+    <h2>Getting started</h2>
+    <ol class="steps">
+      <li>Download the installer and run it. It installs for the current user, so no admin prompt.</li>
+      <li>Open Netplay+ and enter your <strong>Slippi connect code</strong> when asked.</li>
+      <li>Play on Slippi as normal. Netplay+ reads your replays and tracks everything by itself.</li>
+    </ol>
+    <div class="note">
+      <strong>Updates are automatic.</strong> Netplay+ checks on launch and installs new versions in the background &mdash; you do not need to come back here or remove anything first.
+    </div>
+  </section>
+</main>
+
+<footer class="wrap">
+  <a href="https://github.com/eggs-ssbm/npp-releases/releases">All releases</a>
+  <span class="sep" aria-hidden="true">&middot;</span>
+  Not affiliated with Nintendo or Project Slippi.
+</footer>
+
+<script>
+  // Fill in the live version, size and date, and point the button straight at
+  // the installer. Everything here is an enhancement: if the API is rate
+  // limited (60/hr per IP, unauthenticated) or unreachable, the button still
+  // works because its href already targets the /releases/latest redirect.
+  (function () {
+    var meta = document.getElementById('meta');
+    var btn = document.getElementById('download');
+
+    fetch('https://api.github.com/repos/eggs-ssbm/npp-releases/releases/latest')
+      .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+      .then(function (rel) {
+        var exe = (rel.assets || []).filter(function (a) {
+          return /\.exe$/i.test(a.name);
+        })[0];
+        if (exe) {
+          btn.href = exe.browser_download_url;
+          btn.setAttribute('download', '');
+        }
+
+        var bits = [];
+        if (rel.tag_name) bits.push(rel.tag_name);
+        if (exe) bits.push((exe.size / 1048576).toFixed(0) + ' MB');
+        if (rel.published_at) {
+          bits.push(new Date(rel.published_at).toLocaleDateString(undefined, {
+            year: 'numeric', month: 'short', day: 'numeric'
+          }));
+        }
+        meta.innerHTML = bits.join('<span class="sep">&middot;</span>');
+      })
+      .catch(function () {
+        meta.textContent = 'Latest release';
+      });
+  })();
+</script>
+
+</body>
+</html>
