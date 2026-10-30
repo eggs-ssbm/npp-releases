@@ -1,4 +1,7 @@
-# Netplay+ Releases
+<p align="center">
+  <img src="og-image.png" alt="Netplay+" width="640">
+</p>
+
 
 Official release builds for **Netplay+** — achievements, medals and an in-game
 overlay for Slippi netplay.

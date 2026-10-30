@@ -9,12 +9,19 @@
 
 <meta property="og:title" content="Netplay+">
 <meta property="og:description" content="Achievements, medals, an in-game overlay, and more for Slippi netplay.">
-<meta property="og:image" content="logo.png">
+<!-- A dedicated 1280x640 card, not the square logo: link previews on Discord,
+     Slack and X crop to a wide aspect, so a square image gets its sides cut
+     off or letterboxed. The same file is what GitHub wants for the repo's
+     social preview, which is set in the repo settings rather than here. -->
+<meta property="og:image" content="og-image.png">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="640">
+<meta name="twitter:card" content="summary_large_image">
 <meta property="og:type" content="website">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Saira:wght@600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap">
 
 <style>
   /* The app's own palette, so the site and the client look like one product.
@@ -74,10 +81,20 @@
     image-rendering: -webkit-optimize-contrast;
     filter: drop-shadow(0 6px 20px rgba(0,0,0,0.5));
   }
+  /* Headings in Saira, the brand face - the same font the app, the installer
+     and the logo lockups use, so the site and the client agree. Body copy
+     stays M PLUS Rounded 1c on purpose: its softer shapes read better at
+     paragraph length, and the contrast gives the headings more weight.
+     Saira is SIL Open Font License 1.1 (Omnibus-Type). */
+  h1, h2, .card h3 {
+    font-family: "Saira", "M PLUS Rounded 1c", system-ui, sans-serif;
+  }
   h1 {
     font-size: clamp(42px, 8vw, 68px);
     font-weight: 800;
-    letter-spacing: -0.02em;
+    /* Saira is narrower than the rounded face this replaced, so the negative
+       tracking that suited that one closes these letters up too far. */
+    letter-spacing: -0.005em;
     margin: 14px 0 6px;
     line-height: 1;
   }
@@ -248,19 +265,19 @@
       </div>
       <div class="card">
         <h3>Combo Detection</h3>
-        <p>Recognises signature kills as they happen. Every stomp knee, Ken combo, rest, all tracked so you can get rewarded for hitting your sick combo.</p>
+        <p>Recognizes combos as they happen. Every stomp knee, Ken combo, rest, all tracked so you can get rewarded for being sick.</p>
       </div>
       <div class="card">
         <h3>Show Your Style</h3>
-        <p>Avatars, titles, flairs and colours, all earned. Show off what you have actually done.</p>
+        <p>Avatars, titles, flairs and colours, all earned. Show off your personality!</p>
       </div>
       <div class="card">
         <h3>Challenges</h3>
         <p>Weekly challenges, a daily bingo board, and persistent challenges like Iron Man for when you want a real goal.</p>
       </div>
       <div class="card">
-        <h3>Friends &amp; blocking</h3>
-        <p>See who's online, and keep high ping or toxic players out of your unranked matchmaking.</p>
+        <h3>Friends and Enemies</h3>
+        <p>See who's online, and keep high ping or toxic players out of your matchmaking.</p>
       </div>
     </div>
   </section>
