@@ -92,9 +92,13 @@
   h1 {
     font-size: clamp(42px, 8vw, 68px);
     font-weight: 800;
-    /* Saira is narrower than the rounded face this replaced, so the negative
-       tracking that suited that one closes these letters up too far. */
-    letter-spacing: -0.005em;
+    /* Drawn in caps, but set here rather than typed into the markup so the
+       heading still reads and copies as "Netplay+" - the product name is not
+       spelled in capitals, it is only styled that way in the hero. */
+    text-transform: uppercase;
+    /* Caps want air where mixed case did not: the negative tracking that
+       suited lowercase Saira closes flat-sided capitals up too far. */
+    letter-spacing: 0.012em;
     margin: 14px 0 6px;
     line-height: 1;
   }
