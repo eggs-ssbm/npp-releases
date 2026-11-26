@@ -131,6 +131,24 @@
   .cta:active { transform: translateY(0); }
   .cta:focus-visible { outline: 3px solid var(--accent-tint); outline-offset: 3px; }
   .cta svg { width: 19px; height: 19px; flex: none; }
+  /* The other platform's download: same shape, outlined instead of filled, so
+     the visitor's own platform is the obvious one. */
+  .cta.cta-secondary {
+    background: transparent;
+    color: var(--text);
+    border: 1.5px solid var(--border-strong);
+    box-shadow: none;
+    font-size: 16px;
+    padding: 13.5px 26px;
+  }
+  .cta.cta-secondary:hover { background: var(--bg-panel-alt); }
+  .downloads {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+  }
 
   .meta {
     font-family: "IBM Plex Mono", monospace;
@@ -237,21 +255,35 @@
     <h1>Netplay+</h1>
     <p class="tagline">Your all-in-one Slippi companion app.</p>
 
-    <!-- Defaults to the /releases/latest redirect, which always resolves and
-         needs no JavaScript. The script below upgrades it to the direct
-         installer link once it knows the current filename. -->
-    <a class="cta" id="download" href="https://github.com/eggs-ssbm/npp-releases/releases/latest">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
-           stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-        <polyline points="7 10 12 15 17 10"></polyline>
-        <line x1="12" y1="15" x2="12" y2="3"></line>
-      </svg>
-      Download for Windows
-    </a>
+    <!-- Both work with no JavaScript. Windows defaults to the /releases/latest
+         redirect, upgraded by the script below to the direct installer link
+         once it knows the current filename. Linux needs no upgrade: its file is
+         named without a version (netplay-plus-x86_64.AppImage), so the
+         /releases/latest/download/ link always serves the newest one. The
+         script fills in the visitor's own platform as the main button. -->
+    <div class="downloads" id="downloads">
+      <a class="cta" id="download" href="https://github.com/eggs-ssbm/npp-releases/releases/latest">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+          <polyline points="7 10 12 15 17 10"></polyline>
+          <line x1="12" y1="15" x2="12" y2="3"></line>
+        </svg>
+        Download for Windows
+      </a>
+      <a class="cta cta-secondary" id="download-linux" href="https://github.com/eggs-ssbm/npp-releases/releases/latest/download/netplay-plus-x86_64.AppImage">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+          <polyline points="7 10 12 15 17 10"></polyline>
+          <line x1="12" y1="15" x2="12" y2="3"></line>
+        </svg>
+        Download for Linux
+      </a>
+    </div>
 
     <div class="meta" id="meta"></div>
-    <p class="platform">Windows 10 or later &middot; requires Slippi Dolphin</p>
+    <p class="platform">Windows 10 or later &middot; Linux (64-bit AppImage) &middot; requires Slippi Dolphin</p>
   </div>
 </header>
 
@@ -289,12 +321,13 @@
   <section class="wrap">
     <h2>Getting started</h2>
     <ol class="steps">
-      <li>Download the installer and run it. It installs for the current user, so no admin prompt.</li>
+      <li><strong>Windows:</strong> download the installer and run it. It installs for the current user, so no admin prompt.<br>
+          <strong>Linux:</strong> download the AppImage, allow it to run as a program (right-click &rsaquo; Properties, or <code>chmod +x</code>), then open it. On Ubuntu 22.04 and newer, AppImages need <code>libfuse2</code> installed (<code>libfuse2t64</code> on 24.04).</li>
       <li>Open Netplay+, your connect code should be automatically detected.</li>
       <li>Play on Slippi as normal. Netplay+ reads your live game and replays, and tracks everything by itself.</li>
     </ol>
     <div class="note">
-      <strong>Updates are automatic.</strong> Netplay+ checks on launch and installs new versions in the background.
+      <strong>Updates are automatic</strong> on Windows and Linux. Netplay+ checks on launch and installs new versions in the background.
     </div>
   </section>
 </main>
@@ -313,6 +346,18 @@
   (function () {
     var meta = document.getElementById('meta');
     var btn = document.getElementById('download');
+    var linuxBtn = document.getElementById('download-linux');
+
+    // The buttons never move - Windows on the left, Linux on the right - but a
+    // Linux visitor gets the Linux one filled in as the main button. Everyone
+    // else (Windows, and anything unrecognised) keeps Windows as the main one.
+    // Android reports "Linux" too, but has no use for either download.
+    var ua = navigator.userAgent || '';
+    var onLinux = /Linux/i.test(navigator.platform || ua) && !/Android/i.test(ua);
+    if (onLinux) {
+      linuxBtn.classList.remove('cta-secondary');
+      btn.classList.add('cta-secondary');
+    }
 
     fetch('https://api.github.com/repos/eggs-ssbm/npp-releases/releases/latest')
       .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
@@ -320,14 +365,22 @@
         var exe = (rel.assets || []).filter(function (a) {
           return /\.exe$/i.test(a.name);
         })[0];
+        var appImage = (rel.assets || []).filter(function (a) {
+          return /\.AppImage$/i.test(a.name);
+        })[0];
         if (exe) {
           btn.href = exe.browser_download_url;
           btn.setAttribute('download', '');
         }
+        // The Linux build is uploaded a few minutes after the Windows one. In
+        // that window (or if a release ever ships without it) the direct link
+        // would 404, so send people to the release list instead.
+        if (!appImage) linuxBtn.href = 'https://github.com/eggs-ssbm/npp-releases/releases';
 
+        var mine = onLinux ? appImage : exe;
         var bits = [];
         if (rel.tag_name) bits.push(rel.tag_name);
-        if (exe) bits.push((exe.size / 1048576).toFixed(0) + ' MB');
+        if (mine) bits.push((mine.size / 1048576).toFixed(0) + ' MB');
         if (rel.published_at) {
           bits.push(new Date(rel.published_at).toLocaleDateString(undefined, {
             year: 'numeric', month: 'short', day: 'numeric'
